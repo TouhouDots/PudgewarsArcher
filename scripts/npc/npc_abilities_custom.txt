@@ -1,0 +1,480 @@
+
+// Dota Abilities Override File
+"DOTAAbilities"
+{
+	"Version"		"1"
+
+  // the hook ability
+  //----------------------------------------------------------------
+	"dota2x_pudgewars_hook"
+  {
+    "ID"    "1853"
+    "AbilityBehavior"   "DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_POINT"
+    "BaseClass"           "ability_datadriven"
+    "AbilityTextureName"      "pudge_meat_hook"
+
+    // Stats
+    //----------------------------------------------------------------
+    "AbilityCastRange"        "700"
+    "AbilityManaCost"         "95"
+    "AbilityCastPoint"        "0.3"
+    "AbilityCooldown"         "11"
+    "AbilityUnitDamageType"     "DAMAGE_TYPE_PURE"
+    "AbilityCastAnimation"      "pudge_meat_hook_start"
+
+    "OnSpellStart"
+    {
+      "RunScript"
+      {
+        "ScriptFile"        "scripts/vscripts/abilityhook.lua"
+        "Function"          "OnHookStart"
+        "Caster"            "CASTER"
+      }
+      "ApplyModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_pudgemeathook_think_interval"
+      }
+    }
+    "Modifiers"
+    {
+      "modifier_pudgewars_pudgemeathook_think_interval"
+      {
+        "IsHidden"          "1"
+        "Duration"          "5"
+        "ThinkInterval"     "0.1"
+        "OnIntervalThink"
+        {
+          "RunScript"
+          {
+            "ScriptFile"        "scripts/vscripts/abilityhook.lua"
+            "Function"          "OnHookChanneling"
+            "Caster"            "CASTER"
+          }
+        }
+      }
+    }
+  }
+
+  // make the hook unselectable
+  //----------------------------------------------------------------
+  "ability_dota2x_pudgewars_hook_dummy"
+  {
+      "ID"    "1854"
+      "BaseClass"   "ability_datadriven"
+      "Modifiers"
+      {
+        "modifier_hook_finder"
+        {
+        }
+
+        "modifier_phased_movement"
+        {
+          "Passive"       "1"
+          "States"
+          {
+            "MODIFIER_STATE_NO_UNIT_COLLISION"      "MODIFIER_STATE_VALUE_ENABLED"
+            "MODIFIER_STATE_UNSELECTABLE"       "MODIFIER_STATE_VALUE_ENABLED"
+            "MODIFIER_STATE_NOT_ON_MINIMAP_FOR_ENEMIES" "MODIFIER_STATE_VALUE_ENABLED"
+            "MODIFIER_STATE_NO_HEALTH_BAR"        "MODIFIER_STATE_VALUE_ENABLED"
+            "MODIFIER_STATE_OUT_OF_GAME"        "MODIFIER_STATE_VALUE_ENABLED"
+            "MODIFIER_STATE_INVULNERABLE"       "MODIFIER_STATE_VALUE_ENABLED"
+          }
+        }
+      }
+  }
+  
+  // a lasso ability to catch the hooked unit
+  "ability_dota2x_pudgewars_lasso"
+  {
+    "ID"                      "1860"
+    "AbilityBehavior"         "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+    "BaseClass"               "batrider_flaming_lasso"
+    "AbilityBehavior"         "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+    "AbilityUnitTargetTeam"   "DOTA_UNIT_TARGET_TEAM_ENEMY | DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+    "AbilityUnitTargetType"   "DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+    "AbilityUnitTargetFlags"  "DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
+    "MaxLevel"                "1"
+    
+    "AbilityCastPoint"        "0.0"
+
+    "AbilityCastRange"        "1000"
+    "AbilityCooldown"         "0.0"
+
+    "AbilityManaCost"         "0"
+
+    // Special
+    //-------------------------------------------------------------------------------------------------------------
+    "AbilitySpecial"
+    {
+      "01"
+      {
+        "var_type"        "FIELD_FLOAT"
+        "duration"        "50"
+      }
+      "02"
+      {
+        "var_type"        "FIELD_INTEGER"
+        "drag_distance"   "100"
+      }
+      "03"
+      {
+        "var_type"        "FIELD_INTEGER"
+        "break_distance"  "1000"
+      }
+    }
+
+  }
+
+  //增加伤害 每级+35
+  //----------------------------------------------------------------
+  "dota2x_pudgewars_upgrage_hook_damage"
+  {
+    "ID"                  "1855"
+    "AbilityBehavior"     "DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_MOVEMENT | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+    "BaseClass"           "ability_datadriven"
+    "AbilityTextureName"  "pudgewars_upgrade_damage"
+    "MaxLevel"            "4"
+    
+    // Stats
+    //-----------------------------------------------------------------------------
+    "AbilityManaCost"         "0 0 0 0"
+    "AbilityCastPoint"        "0.0 0.0 0.0 0.0"
+    "AbilityChannelTime"      "2 2 2 2"
+    "AbilityCooldown"         "2 2 2 2"
+    "AbilityCastAnimation"    "ACT_DOTA_DISABLED"
+
+    "OnChannelStart"
+    {
+      "RunScript"
+      {
+        "ScriptFile"        "scripts/vscripts/abilityhook.lua"
+        "Function"          "OnUpgradeHookDamage"
+        "Caster"            "CASTER"
+      }
+      "ApplyModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_upgrading_hook"
+      }
+    }
+
+    "OnChannelInterrupted"
+    {
+      "RemoveModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_upgrading_hook"
+      }
+    }
+
+    "OnChannelSucced"
+    {
+      "RemoveModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_upgrading_hook"
+      }
+      "RunScript"
+      {
+        "ScriptFile"        "scripts/vscripts/abilityhook.lua"
+        "Function"          "OnUpgradeHookDamageFinished"
+        "Caster"            "CASTER"
+      }
+    }
+    "Modifiers"
+    {
+      "modifier_pudgewars_upgrading_hook"
+      {
+        "AttachEffect"
+        {
+          "Target"            "CASTER"
+          "EffectName"        "healing_clarity"
+          "EffectAttachType"  "follow_origin"
+        }
+      }
+    }
+    "AbilitySpecial"
+    {
+      "01"
+      {
+        "var_type"        "FIELD_INTEGER"
+        "hook_damage"     "175 250 350 500"
+      }
+    }
+  }
+
+　//增大半径 每级+15
+  //----------------------------------------------------------------
+  "dota2x_pudgewars_upgrade_hook_radius"
+  {
+    "ID"    "1856"
+    "AbilityBehavior"   "DOTA_ABILITY_BEHAVIOR_CHANNELED"
+    "BaseClass"           "ability_datadriven"
+    "AbilityTextureName"   "pudgewars_upgrade_radius"
+
+    // Stats
+    //-----------------------------------------------------------------------------
+    "AbilityManaCost"         "0 0 0 0"
+    "AbilityCastPoint"        "0.0 0.0 0.0 0.0"
+    "AbilityChannelTime"      "2 2 2 2"
+    "AbilityCooldown"         "2 2 2 2"
+    "AbilityCastAnimation"    "ACT_DOTA_DISABLED"
+
+    "OnChannelStart"
+    {
+      "RunScript"
+      {
+        "ScriptFile"        "scripts/vscripts/abilityhook.lua"
+        "Function"          "OnUpgradeHookRadius"
+        "Caster"            "CASTER"
+      }
+      "ApplyModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_upgrading_hook"
+      }
+    }
+
+    "OnChannelInterrupted"
+    {
+      "RemoveModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_upgrading_hook"
+      }
+    }
+
+    "OnChannelSucced"
+    {
+      "RemoveModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_upgrading_hook"
+      }
+      "RunScript"
+      {
+        "ScriptFile"        "scripts/vscripts/abilityhook.lua"
+        "Function"          "OnUpgradeHookRadiusFinished"
+        "Caster"            "CASTER"
+      }
+    }
+    "Modifiers"
+    {
+      "modifier_pudgewars_upgrading_hook"
+      {
+        "AttachEffect"
+        {
+          "Target"            "CASTER"
+          "EffectName"        "healing_clarity"
+          "EffectAttachType"  "follow_origin"
+        }
+      }
+    }
+    "AbilitySpecial"
+    {
+      "01"
+      {
+        "var_type"        "FIELD_INTEGER"
+        "hook_radius"      "20 30 50 80"
+      }
+    }
+  }
+
+　//增加范围(即长度) 每级+175
+  //----------------------------------------------------------------
+  "dota2x_pudgewars_upgrade_hook_length"
+  {
+    "ID"    "1857"
+    "AbilityBehavior"   "DOTA_ABILITY_BEHAVIOR_CHANNELED"
+    "BaseClass"           "ability_datadriven"
+    "AbilityTextureName"   "pudgewars_upgrade_length"
+
+    // Stats
+    //-----------------------------------------------------------------------------
+    "AbilityManaCost"         "0 0 0 0"
+    "AbilityCastPoint"        "0.0 0.0 0.0 0.0"
+    "AbilityChannelTime"      "2 2 2 2"
+    "AbilityCooldown"         "2 2 2 2"
+    "AbilityCastAnimation"    "ACT_DOTA_DISABLED"
+
+    "OnChannelStart"
+    {
+      "RunScript"
+      {
+        "ScriptFile"        "scripts/vscripts/abilityhook.lua"
+        "Function"          "OnUpgradeHookLength"
+        "Caster"            "CASTER"
+      }
+      "ApplyModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_upgrading_hook"
+      }
+    }
+
+    "OnChannelInterrupted"
+    {
+      "RemoveModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_upgrading_hook"
+      }
+    }
+
+    "OnChannelSucced"
+    {
+      "RemoveModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_upgrading_hook"
+      }
+      "RunScript"
+      {
+        "ScriptFile"        "scripts/vscripts/abilityhook.lua"
+        "Function"          "OnUpgradeHookLengthFinished"
+        "Caster"            "CASTER"
+      }
+    }
+    "Modifiers"
+    {
+      "modifier_pudgewars_upgrading_hook"
+      {
+        "AttachEffect"
+        {
+          "Target"            "CASTER"
+          "EffectName"        "healing_clarity"
+          "EffectAttachType"  "follow_origin"
+        }
+      }
+    }
+    "AbilitySpecial"
+    {
+      "01"
+      {
+        "var_type"        "FIELD_INTEGER"
+        "hook_length"     "500 700 900 1200"
+      }
+    }
+  }
+
+　//增快速度 每级+30
+  //----------------------------------------------------------------
+  "dota2x_pudgewars_upgrade_hook_speed"
+  {
+    "ID"    "1858"
+    "AbilityBehavior"   "DOTA_ABILITY_BEHAVIOR_CHANNELED"
+    "BaseClass"           "ability_datadriven"
+    "AbilityTextureName"   "pudgewars_upgrade_speed"
+
+    // Stats
+    //-----------------------------------------------------------------------------
+    "AbilityManaCost"         "0 0 0 0"
+    "AbilityCastPoint"        "0.0 0.0 0.0 0.0"
+    "AbilityChannelTime"      "2 2 2 2"
+    "AbilityCooldown"         "2 2 2 2"
+    "AbilityCastAnimation"    "ACT_DOTA_DISABLED"
+
+    "OnChannelStart"
+    {
+      "RunScript"
+      {
+        "ScriptFile"        "scripts/vscripts/abilityhook.lua"
+        "Function"          "OnUpgradeHookSpeed"
+        "Caster"            "CASTER"
+      }
+      "ApplyModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_upgrading_hook"
+      }
+    }
+
+    "OnChannelInterrupted"
+    {
+      "RemoveModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_upgrading_hook"
+      }
+    }
+
+    "OnChannelSucced"
+    {
+      "RemoveModifier"
+      {
+        "Target"            "CASTER"
+        "ModifierName"      "modifier_pudgewars_upgrading_hook"
+      }
+      "RunScript"
+      {
+        "ScriptFile"        "scripts/vscripts/abilityhook.lua"
+        "Function"          "OnUpgradeHookSpeedFinished"
+        "Caster"            "CASTER"
+      }
+    }
+    "Modifiers"
+    {
+      "modifier_pudgewars_upgrading_hook"
+      {
+        "AttachEffect"
+        {
+          "Target"            "CASTER"
+          "EffectName"        "healing_clarity"
+          "EffectAttachType"  "follow_origin"
+        }
+      }
+    }
+    "AbilitySpecial"
+    {
+      "01"
+      {
+        "var_type"        "FIELD_INTEGER"
+        "hook_speed"      "400 450 520 600"
+      }
+    }
+  }
+
+  "Modifiers"
+  {
+    "modifier_pudgewars_hooked"
+    {
+      "States"
+      {
+        "MODIFIER_STATE_ROOTED"               "MODIFIER_STATE_VALUE_ENABLED"
+        "MODIFIER_STATE_SILENCED"             "MODIFIER_STATE_VALUE_ENABLED"
+        "MODIFIER_STATE_NO_UNIT_COLLISION"    "MODIFIER_STATE_VALUE_ENABLED"
+      }
+    }
+
+    "modifier_pudgewars_hook_speed_bonus_1"
+    {
+      "States"
+      {
+        "MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"        "175"
+      }
+    }
+    "modifier_pudgewars_hook_speed_bonus_2"
+    {
+      "States"
+      {
+        "MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"        "250"
+      }
+    }
+    "modifier_pudgewars_hook_speed_bonus_3"
+    {
+      "States"
+      {
+        "MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"        "350"
+      }
+    }
+    "modifier_pudgewars_hook_speed_bonus_4"
+    {
+      "States"
+      {
+        "MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT"        "500"
+      }
+    }
+  }
+}
+
